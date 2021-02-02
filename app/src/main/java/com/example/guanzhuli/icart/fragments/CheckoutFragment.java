@@ -23,7 +23,6 @@ import com.android.volley.toolbox.Volley;
 import com.example.guanzhuli.icart.CartActivity;
 import com.example.guanzhuli.icart.R;
 import com.example.guanzhuli.icart.adapters.CheckoutItemAdapter;
-import com.example.guanzhuli.icart.data.DBManipulation;
 import com.example.guanzhuli.icart.data.Item;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.example.guanzhuli.icart.data.ShoppingCartList;
@@ -62,7 +61,7 @@ public class CheckoutFragment extends Fragment {
     private Button mButtonConfirm, mButtonCancel;
     private RequestQueue mRequestQueue;
     private RecyclerView mRecyclerView;
-    private DBManipulation mDBManipulation;
+
     private SPManipulation mSPManipulation;
     private String mobile;
     private ShoppingCartList mCartList;
@@ -194,11 +193,11 @@ public class CheckoutFragment extends Fragment {
         //--- include an item list, payment amount details
         PayPalItem[] items = new PayPalItem[mItemList.size()];
         for (int i = 0; i <  mItemList.size(); i++) {
-            items[i] = new PayPalItem(mItemList.get(i).getName(),
-                    mItemList.get(i).getQuantity(),
-                    new BigDecimal(mItemList.get(i).getPrice()),
+            items[i] = new PayPalItem(mItemList.get(i).getNomeProduto(),
+                    mItemList.get(i).getQuantidadeMinima(),
+                    new BigDecimal(mItemList.get(i).getPreco()),
                     "HKD",
-                    mItemList.get(i).getId());
+                    mItemList.get(i).getId().toString());
         }
         BigDecimal subtotal = PayPalItem.getItemTotal(items);
         BigDecimal shipping = new BigDecimal("0.00");
@@ -217,17 +216,17 @@ public class CheckoutFragment extends Fragment {
     private void registerOrder(){
         for (int i = 0; i < mItemList.size(); i++) {
 //  http://rjtmobile.com/ansari/shopingcart/androidapp/orders.php?&item_id=701&item_names=laptop&item_quantity=1&final_price=100000&mobile=654987
-            double finalPrice = mItemList.get(i).getQuantity() * mItemList.get(i).getPrice();
+            double finalPrice = mItemList.get(i).getQuantidadeMinima() * mItemList.get(i).getPreco();
             String name = "";
             try {
-                name = URLEncoder.encode(mItemList.get(i).getName(), "UTF-8");
+                name = URLEncoder.encode(mItemList.get(i).getNomeProduto(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
                 return;
             }
             String url = CHECKOUT_URL + mItemList.get(i).getId()
                     + "&item_names=" + name
-                    + "&item_quantity=" + mItemList.get(i).getQuantity()
+                    + "&item_quantity=" + mItemList.get(i).getQuantidadeMinima()
                     + "&final_price=" + finalPrice + "&mobile=" + mobile;
             StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
@@ -254,8 +253,7 @@ public class CheckoutFragment extends Fragment {
 
         mItemList.clear();
 
-        mDBManipulation = DBManipulation.getInstance(getContext(),mSPManipulation.getName()+ mSPManipulation.getMobile());
-        mDBManipulation.deleteAll();
+
         OrderSuccessFragment orderSuccessFragment = new OrderSuccessFragment();
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.checkout_fragment_container, orderSuccessFragment).commit();
     }
@@ -263,7 +261,7 @@ public class CheckoutFragment extends Fragment {
     private double calculateTotal(List<Item> itemList) {
         double result = 0;
         for (int i = 0; i < itemList.size(); i++) {
-            result += itemList.get(i).getPrice() * itemList.get(i).getQuantity();
+            result += itemList.get(i).getPreco() * itemList.get(i).getQuantidadeMinima();
         }
         return result;
     }

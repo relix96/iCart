@@ -28,20 +28,20 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.guanzhuli.icart.fragments.SubCategoryFragment.SUBCATEGORY_ID_KEY;
+import static com.example.guanzhuli.icart.fragments.SubCategoryFragment.CATEGORY_NAME_KEY;
 
 public class ItemListFragment extends Fragment {
-    public static final String ITEMLIST_URL =
-            "http://rjtmobile.com/ansari/shopingcart/androidapp/cust_product.php?Id=";
-    public static final String ITEM_ID_KEY = "itemID";
+    public static final String ITEMLIST_URL = "http://192.168.80.1:8080/product/category/";
+    public static final String CATEGORY_NAME_KEY = "categoryName";
     private ImageButton mButtonListView, mButtonGridView;
     RecyclerView recyclerView;
     List<Item> itemList;
+    String cName;
 
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle("Products");
+        getActivity().setTitle(cName);
     }
 
     @Override
@@ -58,30 +58,35 @@ public class ItemListFragment extends Fragment {
         Bundle bundle = this.getArguments();
         String url = null;
         if (bundle != null) {
-            String subcategoryID = bundle.getString(SUBCATEGORY_ID_KEY, "-1");
-            if (subcategoryID.equals("-1")) {
-                Toast.makeText(getContext(),"SubCategoryID invalid", Toast.LENGTH_SHORT).show();
+            String categoryName = bundle.getString(CATEGORY_NAME_KEY, "-1");
+            cName = categoryName;
+            if (categoryName.equals("-1")) {
+                Toast.makeText(getContext(),"CategoryName invalid", Toast.LENGTH_SHORT).show();
                 return view;
             } else {
-                url = ITEMLIST_URL + subcategoryID;
+                url = ITEMLIST_URL + categoryName+"/NONE";
             }
         }
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String s) {
+                    public void onResponse(String response) {
                         itemList = new ArrayList<>();
                         try {
-                            JSONArray items = new JSONObject(s).getJSONArray("Product");
+                            JSONArray items = new JSONArray(response);
                             for (int i = 0; i < items.length(); i++) {
                                 JSONObject item = items.getJSONObject(i);
-                                String id = item.getString("Id");
-                                String name = item.getString("ProductName");
-                                int quantity = item.getInt("Quantity");
-                                double price = item.getDouble("Prize");
-                                String description = item.getString("Discription");
-                                String imageUrl = item.getString("Image");
-                                itemList.add(new Item(id, name, imageUrl, description, quantity, price));
+                                Integer id = item.getInt("id");
+                                String name = item.getString("nomeProduto");
+                                Double preco = item.getDouble("preco");
+                                Double precoPack = item.getDouble("precoPack");
+                                String porcao = item.getString("porcao");
+                                String porcaoPack = item.getString("porcaoPack");
+                                Integer qtdMinima = item.getInt("quantidadeMinima");
+                                String description = item.getString("descricao");
+                                String imageUrl = item.getString("id");
+                                Integer idCategoria = item.getInt("idCategoria");
+                                itemList.add(new Item(id, name, preco,precoPack,porcao,porcaoPack,qtdMinima,description,idCategoria));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

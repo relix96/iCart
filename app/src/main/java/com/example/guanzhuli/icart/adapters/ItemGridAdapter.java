@@ -50,20 +50,20 @@ public class ItemGridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     @Override
     public void onBindViewHolder(GridViewHolder holder, final int position) {
         holder.mTextID.setText(mItemArrayList.get(position).getId());
-        holder.mTextName.setText(mItemArrayList.get(position).getName());
-        holder.mTextPrice.setText(Double.toString(mItemArrayList.get(position).getPrice()));
-        holder.mImageView.setImageUrl(mItemArrayList.get(position).getImageurl(), mImageLoader);
+        holder.mTextName.setText(mItemArrayList.get(position).getNomeProduto());
+        holder.mTextPrice.setText(Double.toString(mItemArrayList.get(position).getPreco()));
+        //holder.mImageView.setImageUrl(mItemArrayList.get(position).getImageurl(), mImageLoader);
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString(ITEM_ID, mItemArrayList.get(position).getId());
-                bundle.putString(ITEM_NAME, mItemArrayList.get(position).getName());
-                bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescription());
-                bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());
-                bundle.putInt(ITEM_MAXQUANTITY, mItemArrayList.get(position).getQuantity());
-                bundle.putDouble(ITEM_PRICE, mItemArrayList.get(position).getPrice());
+                bundle.putString(ITEM_ID, mItemArrayList.get(position).getId().toString());
+                bundle.putString(ITEM_NAME, mItemArrayList.get(position).getNomeProduto());
+                bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescricao());
+                //bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());
+                bundle.putInt(ITEM_MAXQUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
+                bundle.putDouble(ITEM_PRICE, mItemArrayList.get(position).getPreco());
                 itemDetailFragment.setArguments(bundle);
                 AppCompatActivity activity = (AppCompatActivity) view.getContext();
                 activity.getSupportFragmentManager()

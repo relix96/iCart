@@ -18,7 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import com.example.guanzhuli.icart.data.DBManipulation;
+
 import com.example.guanzhuli.icart.fragments.*;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.facebook.login.LoginManager;
@@ -27,7 +27,6 @@ import com.facebook.login.LoginManager;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private SPManipulation mSPManipulation;
-    private DBManipulation mDBManipulation;
 
 
     @Override
@@ -66,9 +65,9 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         String name = mSPManipulation.getName();
         String mobile = mSPManipulation.getMobile();
-        int amount = DBManipulation.getInstance(this, name + mobile).getRecordNumber();
+        //int amount = DBManipulation.getInstance(this, name + mobile).getRecordNumber();
         TextView textAmount = (TextView) findViewById(R.id.cart_amount);
-        textAmount.setText(Integer.toString(amount));
+        //textAmount.setText(Integer.toString(amount));
     }
 
     @Override

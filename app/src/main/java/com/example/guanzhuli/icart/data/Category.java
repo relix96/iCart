@@ -6,10 +6,10 @@ package com.example.guanzhuli.icart.data;
 public class Category {
     private String mImageUrl;
     private String mName;
-    private String mId;
+    private Integer mId;
     private String mDescription;
 
-    public Category(String imageUrl, String name, String id, String description) {
+    public Category(String imageUrl, String name, Integer id, String description) {
         mImageUrl = imageUrl;
         mName = name;
         mId = id;
@@ -24,7 +24,7 @@ public class Category {
         return mName;
     }
 
-    public String getId() {
+    public Integer getId() {
         return mId;
     }
 

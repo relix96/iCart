@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.guanzhuli.icart.adapters.CartListAdapter;
-import com.example.guanzhuli.icart.data.DBManipulation;
 import com.example.guanzhuli.icart.data.Item;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.example.guanzhuli.icart.data.ShoppingCartList;
@@ -21,7 +20,7 @@ public class CartActivity extends AppCompatActivity {
     private TextView mTextTotal;
     private Button mButtonContinue, mButtonCheckout;
     private RecyclerView recyclerView;
-    private DBManipulation mDBManipulation;
+
     private SPManipulation mSPManipulation;
     private ShoppingCartList itemList;
 
@@ -33,10 +32,10 @@ public class CartActivity extends AppCompatActivity {
         mSPManipulation = SPManipulation.getInstance(this);
         String name =  mSPManipulation.getName();
         String mobile =  mSPManipulation.getMobile();
-        mDBManipulation = DBManipulation.getInstance(this, name + mobile);
+        //mDBManipulation = DBManipulation.getInstance(this, name + mobile);
         itemList = ShoppingCartList.getInstance();
         itemList.clear();
-        itemList.addAll( mDBManipulation.selectAll());
+        //itemList.addAll( mDBManipulation.selectAll());
         //itemList = mDBManipulation.selectAll();
         CartListAdapter cartListAdapter = new CartListAdapter(CartActivity.this, itemList, this);
         recyclerView.setAdapter(cartListAdapter);
@@ -69,7 +68,7 @@ public class CartActivity extends AppCompatActivity {
     private double calculateTotal(List<Item> itemList) {
         double result = 0;
         for (int i = 0; i < itemList.size(); i++) {
-            result += itemList.get(i).getPrice() * itemList.get(i).getQuantity();
+            //result += itemList.get(i).getPrice() * itemList.get(i).getQuantity();
         }
         return result;
     }

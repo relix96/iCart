@@ -16,7 +16,6 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.guanzhuli.icart.CheckoutActivity;
 import com.example.guanzhuli.icart.R;
-import com.example.guanzhuli.icart.data.DBManipulation;
 import com.example.guanzhuli.icart.data.Item;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.example.guanzhuli.icart.data.ShoppingCartList;
@@ -34,7 +33,6 @@ public class ItemDetailFragment extends Fragment {
     private Button mButtonAddCart, mButtonChceckout;
     private ImageLoader mImageLoader;
     private AppController mController;
-    private DBManipulation mDBManipulation;
     private SPManipulation mSPManipulation;
     private Item mItem;
     private ShoppingCartList mCartList;
@@ -69,22 +67,22 @@ public class ItemDetailFragment extends Fragment {
 
     private void setTextViewData() {
         mTextId.setText("SKU: " + mItem.getId());
-        mTextName.setText(mItem.getName());
-        mTextDescription.setText("Description: " + mItem.getDescription());
-        mTextPrice.setText("Price: " + Double.toString(mItem.getPrice()));
-        mImageView.setImageUrl(mItem.getImageurl(), mImageLoader);
+        mTextName.setText(mItem.getNomeProduto());
+        mTextDescription.setText("Description: " + mItem.getDescricao());
+        mTextPrice.setText("Price: " + Double.toString(mItem.getPreco()));
+        //mImageView.setImageUrl(mItem.getImageurl(), mImageLoader);
     }
 
     private void getBundleData() {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             mItem = new Item();
-            mItem.setMaxQuant(bundle.getInt(ITEM_MAXQUANTITY));
-            mItem.setName(bundle.getString(ITEM_NAME));
-            mItem.setId(bundle.getString(ITEM_ID));
-            mItem.setDescription(bundle.getString(ITEM_DES));
-            mItem.setPrice(bundle.getDouble(ITEM_PRICE));
-            mItem.setImageurl(bundle.getString(ITEM_IMAGEURL));
+            mItem.setQuantidadeMinima(bundle.getInt(ITEM_MAXQUANTITY));
+            mItem.setNomeProduto(bundle.getString(ITEM_NAME));
+            mItem.setId(bundle.getInt(ITEM_ID));
+            mItem.setDescricao(bundle.getString(ITEM_DES));
+            mItem.setPreco(bundle.getDouble(ITEM_PRICE));
+            //mItem.setImageurl(bundle.getString(ITEM_IMAGEURL));
         }
     }
 
@@ -99,7 +97,7 @@ public class ItemDetailFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 int quant  = Integer.valueOf(mTextQuant.getText().toString());
-                if (quant + 1 > mItem.getMaxQuant()) {
+                if (quant + 1 > mItem.getQuantidadeMinima()) {
                     Toast.makeText(getContext(), "Exceeds the stock limit", Toast.LENGTH_SHORT).show();
                 } else {
                     mTextQuant.setText(String.valueOf(quant + 1));
@@ -118,16 +116,16 @@ public class ItemDetailFragment extends Fragment {
             }
         });
         mButtonAddCart = (Button) getView().findViewById(R.id.add_cart);
-
+/*
         mButtonAddCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name = mSPManipulation.getName();
                 String mobile = mSPManipulation.getMobile();
-                mDBManipulation = DBManipulation.getInstance(getContext(), name + mobile);
+               // mDBManipulation = DBManipulation.getInstance(getContext(), name + mobile);
                 // add current quant
                 int curQuant = Integer.valueOf(mTextQuant.getText().toString());
-                int prevQuant = mDBManipulation.getQuantity(mItem.getId());
+               // int prevQuant = mDBManipulation.getQuantity(mItem.getId());
                 if (prevQuant != 0) {
                     if (prevQuant + curQuant > mItem.getMaxQuant()) {
                         Toast.makeText(getContext(), "Exceeds the stock limit", Toast.LENGTH_LONG).show();
@@ -141,12 +139,12 @@ public class ItemDetailFragment extends Fragment {
                 TextView textAmount = (TextView) getActivity().findViewById(R.id.cart_amount);
                 textAmount.setText(Integer.toString(mDBManipulation.getRecordNumber()));
             }
-        });
+        });*/
         mButtonChceckout = (Button) getView().findViewById(R.id.checkout);
         mButtonChceckout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mItem.setQuantity(Integer.valueOf(mTextQuant.getText().toString()));
+               // mItem.setQuantity(Integer.valueOf(mTextQuant.getText().toString()));
                 // mCartList.add(mItem);
                 Intent i = new Intent(getContext(), CheckoutActivity.class);
                 i.putExtra("SingleItem", true);

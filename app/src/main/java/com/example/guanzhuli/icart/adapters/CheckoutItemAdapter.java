@@ -52,11 +52,11 @@ public class CheckoutItemAdapter extends RecyclerView.Adapter<ItemHolder> {
     @Override
     public void onBindViewHolder(ItemHolder holder, int position) {
         holder.mTextId.setText(checkoutItem.get(position).getId());
-        holder.mTextQuant.setText(Integer.toString(checkoutItem.get(position).getQuantity()));
-        holder.mTextName.setText(checkoutItem.get(position).getName());
+        holder.mTextQuant.setText(Integer.toString(checkoutItem.get(position).getQuantidadeMinima()));
+        holder.mTextName.setText(checkoutItem.get(position).getNomeProduto());
         holder.mTextPrice.setText(Double.toString(
-                checkoutItem.get(position).getPrice() * checkoutItem.get(position).getQuantity()));
-        holder.mImage.setImageUrl(checkoutItem.get(position).getImageurl(), mImageLoader);
+                checkoutItem.get(position).getPreco() * checkoutItem.get(position).getQuantidadeMinima()));
+        //holder.mImage.setImageUrl(checkoutItem.get(position).getImageurl(), mImageLoader);
         holder.mButtonDelete.setVisibility(View.INVISIBLE);
         holder.mButtonQuantMinus.setVisibility(View.INVISIBLE);
         holder.mButtonQuantAdd.setVisibility(View.INVISIBLE);

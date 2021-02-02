@@ -32,7 +32,7 @@ public class SubCategoryFragment extends Fragment {
     // private RequestQueue mRequestQueue;
     public static final String SUB_CATEGORY_URL =
             "http://rjtmobile.com/ansari/shopingcart/androidapp/cust_sub_category.php?Id=";
-    public static final String SUBCATEGORY_ID_KEY = "subcategoryID";
+    public static final String CATEGORY_NAME_KEY = "categoryName";
 
     @Override
     public void onAttach(Context context) {
@@ -71,10 +71,10 @@ public class SubCategoryFragment extends Fragment {
                             JSONArray categories = new JSONObject(s).getJSONArray("SubCategory");
                             for (int i = 0; i < categories.length(); i++) {
                                 JSONObject item = categories.getJSONObject(i);
+                                Integer id = item.getInt("Id");
                                 String name = item.getString("SubCatagoryName");
-                                String imageUrl = item.getString("CatagoryImage");
-                                String id = item.getString("Id");
                                 String description = item.getString("SubCatagoryDiscription");
+                                String imageUrl = item.getString("CatagoryImage");
                                 categoryList.add(new Category(imageUrl, name, id, description));
                             }
                         } catch (JSONException e) {
@@ -89,7 +89,7 @@ public class SubCategoryFragment extends Fragment {
                                 Category category = (Category) adapterView.getItemAtPosition(i);
                                 ItemListFragment itemListFragment = new ItemListFragment();
                                 Bundle bundle = new Bundle();
-                                bundle.putString(SUBCATEGORY_ID_KEY, category.getId());
+                                bundle.putString(CATEGORY_NAME_KEY, category.getId().toString());
                                 itemListFragment.setArguments(bundle);
                                 getActivity().getSupportFragmentManager()
                                         .beginTransaction()

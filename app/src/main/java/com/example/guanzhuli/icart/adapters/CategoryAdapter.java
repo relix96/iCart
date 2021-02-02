@@ -79,9 +79,9 @@ public class CategoryAdapter extends ArrayAdapter<Category> {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.category_listview_item, null);
             holder = new ViewHolder();
-            holder.setCategoryNameTextView((TextView) convertView.findViewById(R.id.list_view_category_text));
-            holder.setCategoryDescTextView((TextView) convertView.findViewById(R.id.list_view_category_desc));
-            holder.setImageView((NetworkImageView) convertView.findViewById(R.id.list_view_category_img));
+            holder.setCategoryNameTextView((TextView) convertView.findViewById(R.id.list_view_product_text));
+            holder.setCategoryDescTextView((TextView) convertView.findViewById(R.id.list_view_product_desc));
+            holder.setImageView((NetworkImageView) convertView.findViewById(R.id.list_view_product_img));
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

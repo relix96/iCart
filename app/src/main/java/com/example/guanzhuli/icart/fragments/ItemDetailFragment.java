@@ -69,7 +69,7 @@ public class ItemDetailFragment extends Fragment {
         mTextId.setText("SKU: " + mItem.getId());
         mTextName.setText(mItem.getNomeProduto());
         mTextDescription.setText("Description: " + mItem.getDescricao());
-        mTextPrice.setText("Price: " + Double.toString(mItem.getPreco()));
+        mTextPrice.setText("Price: " + Double.toString(mItem.getPreco())+" €");
         //mImageView.setImageUrl(mItem.getImageurl(), mImageLoader);
     }
 

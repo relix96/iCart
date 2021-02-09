@@ -54,7 +54,6 @@ public class ItemListAdapter extends RecyclerView.Adapter<ListViewHolder>{
             public void onClick(View view) {
                 ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString(ITEM_ID, mItemArrayList.get(position).getId().toString());
                 bundle.putString(ITEM_NAME, mItemArrayList.get(position).getNomeProduto());
                 bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescricao());
                 bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());

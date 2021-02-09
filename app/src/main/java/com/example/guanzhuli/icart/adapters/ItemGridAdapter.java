@@ -1,5 +1,6 @@
 package com.example.guanzhuli.icart.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -48,7 +49,7 @@ public class ItemGridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(GridViewHolder holder, final int position) {
+    public void onBindViewHolder(GridViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         holder.mTextID.setText(mItemArrayList.get(position).getId());
         holder.mTextName.setText(mItemArrayList.get(position).getNomeProduto());
         holder.mTextPrice.setText(Double.toString(mItemArrayList.get(position).getPreco()));
@@ -58,7 +59,6 @@ public class ItemGridAdapter extends RecyclerView.Adapter<GridViewHolder> {
             public void onClick(View view) {
                 ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
                 Bundle bundle = new Bundle();
-                bundle.putString(ITEM_ID, mItemArrayList.get(position).getId().toString());
                 bundle.putString(ITEM_NAME, mItemArrayList.get(position).getNomeProduto());
                 bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescricao());
                 //bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());

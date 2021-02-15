@@ -18,22 +18,41 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+
 import com.example.guanzhuli.icart.data.SPManipulation;
+import com.example.guanzhuli.icart.service.ClientService;
+import com.example.guanzhuli.icart.utils.API;
 import com.example.guanzhuli.icart.utils.AppController;
+
 import com.facebook.*;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import org.json.JSONArray;
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.nio.Buffer;
+
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okhttp3.internal.http2.ErrorCode;
+import okio.BufferedSink;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 // http://rjtmobile.com/ansari/shopingcart/androidapp/shop_login.php?mobile=123456&password=ansari
 public class SignInActivity extends AppCompatActivity {
+
+    ClientService clientService;
+    String cookie;
 
     private static final String LOGIN_URL = "http://192.168.80.1:8080/user/login/cliente/";
     private LoginButton mLoginButton;
@@ -44,6 +63,7 @@ public class SignInActivity extends AppCompatActivity {
     private AppController mController;
     private RequestQueue mRequestQueue;
     private SPManipulation mSPManipulation;
+    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,82 +84,13 @@ public class SignInActivity extends AppCompatActivity {
         mButtonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String email = mTextUsername.getText().toString();
-                final String pwd = mTextPassword.getText().toString();
-                String url = LOGIN_URL + email;
 
-
-                JSONObject data = new JSONObject();
                 try {
-                    data.put("mail",email);
-                    data.put("password", pwd);
-                } catch (JSONException e) {
+                    login();
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
-                final String[] requestBody = {data.toString()};
 
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String s) {
-                                try {
-                                    JSONArray array = new JSONArray();
-                                    JSONObject obj = array.getJSONObject(0);
-                                    String msg = s;
-                                    if (msg.contains("200")) {
-                                        // new SPManipulation().save(SignInActivity.this, s);
-                                        String username = obj.getString("UserName");
-                                        String email = obj.getString("UserEmail");
-                                        mSPManipulation.saveName(username);
-                                        mSPManipulation.saveEmail(email);
-                                        mSPManipulation.savePwd(pwd);
-                                        mSPManipulation.saveMobile(email);
-                                        Intent i = new Intent(SignInActivity.this, MainActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                    return;
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(SignInActivity.this,
-                                "Username and password does not match!", Toast.LENGTH_LONG).show();
-                    }
-                }){
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8";
-                    }
-
-                    @Override
-                    public byte[] getBody() throws AuthFailureError {
-                        try {
-                            requestBody[0] = postData(email,pwd);
-                            return requestBody[0] == null ? null : requestBody[0].getBytes("utf-8");
-                        } catch (UnsupportedEncodingException | JSONException uee) {
-                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody[0], "utf-8");
-                            return null;
-                        }
-                    }
-
-                    @Override
-                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                        String responseString = "";
-                        if (response != null) {
-                            responseString = String.valueOf(response.statusCode);
-                            // can get more details such as response.headers
-                        }
-                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-                    }
-                };
-
-
-                mRequestQueue.add(stringRequest);
             }
         });
         mTextSignUp = (TextView) findViewById(R.id.to_sign_up);
@@ -207,12 +158,54 @@ public class SignInActivity extends AppCompatActivity {
 
     }
 
-    public String postData(String email, String pwd) throws JSONException {
-        JSONObject data = new JSONObject();
-        data.put("mail",email);
-        data.put("password", pwd);
-        return data.toString();
+    public String login() throws JSONException, IOException {
+        ClientService clientService;
 
+        final String mail = mTextUsername.getText().toString();
+        final String password = mTextPassword.getText().toString();
+        String url = LOGIN_URL + mail;
+        final RequestBody pwd = RequestBody.create(MediaType.parse("text/plain"),password);
+
+        final String[] hashcode = {null};
+        clientService = API.getClientService();
+        Call<ResponseBody> call = clientService.loginClient(pwd,mail);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        hashcode[0] = response.body().string();
+                        Toast.makeText(SignInActivity.this, hashcode[0], Toast.LENGTH_LONG).show();
+                        mSPManipulation.saveName(mail);
+                        mSPManipulation.saveEmail(mail);
+                        mSPManipulation.savePwd(password);
+                        mSPManipulation.saveMobile(mail);
+                        Intent i = new Intent(SignInActivity.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                else {
+                    Toast.makeText(SignInActivity.this,response.errorBody().toString(), Toast.LENGTH_LONG).show();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+
+        });
+
+
+
+        return hashcode[0];
     }
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {

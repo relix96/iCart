@@ -1,18 +1,18 @@
 package com.example.guanzhuli.icart;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.Request;
+
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.guanzhuli.icart.data.Client;
+import com.example.guanzhuli.icart.data.MoradaData;
 import com.example.guanzhuli.icart.data.SPManipulation;
 
 
@@ -20,64 +20,57 @@ import com.example.guanzhuli.icart.data.SPManipulation;
 // http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20name=aamir&email=aa@gmail.com&mobile=555454545465&password=7011
 public class SignUpActivity extends AppCompatActivity {
     private static final String REGISTER_URL = "http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20";
-    private TextView mTextUsername, mTextMobile, mTextEmail, mTextPwd, mTextRePwd, mTextSignIn;
-    private Button mButtonSignUp;
+    private TextView mTextfirstName, mTextlastName, mTextEmail, mTextPwd, mTextRePwd, mTextSignIn, mTextPhone;
+    private Button mButtonContinue;
     private RequestQueue mRequestQueue;
     private SPManipulation mSPManipulation;
+    private Client client;
+    private MoradaData morada;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        client = new Client();
+        morada = new MoradaData();
+        client.setMorada(morada);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         mSPManipulation = SPManipulation.getInstance(this);
         mRequestQueue =  Volley.newRequestQueue(SignUpActivity.this);
-        mTextUsername = (TextView) findViewById(R.id.sign_up_username);
-        mTextMobile = (TextView) findViewById(R.id.sign_up_mobile);
-        mTextEmail = (TextView) findViewById(R.id.sign_up_email);
+        mTextfirstName = (TextView) findViewById(R.id.sign_up_Address);
+        mTextlastName = (TextView) findViewById(R.id.sign_up_postCode);
+        mTextPhone = (TextView) findViewById(R.id.sign_up_phone);
+        mTextEmail = (TextView) findViewById(R.id.sign_up_City);
         mTextPwd = (TextView) findViewById(R.id.sign_up_password);
         mTextRePwd = (TextView) findViewById(R.id.sign_up_password2);
-        mButtonSignUp = (Button) findViewById(R.id.button_sign_up);
-        mButtonSignUp.setOnClickListener(new View.OnClickListener() {
+        mButtonContinue = (Button) findViewById(R.id.button_signIn);
+        mButtonContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String username = mTextUsername.getText().toString();
+                String firstName = mTextfirstName.getText().toString();
                 // add method to check illegal character
-                final String mobile = mTextMobile.getText().toString();
+                String lastName = mTextlastName.getText().toString();
                 // add method to check all are numbers
-                final String email = mTextEmail.getText().toString();
+                String email = mTextEmail.getText().toString();
+                String phone = mTextPhone.getText().toString();
                 // add method to check email format
-                final String pwd = mTextPwd.getText().toString();
+                String pwd = mTextPwd.getText().toString();
                 String pwd2 = mTextRePwd.getText().toString();
                 if (!pwdMatch(pwd, pwd2)) {
                     Toast.makeText(SignUpActivity.this, "Password does not match!", Toast.LENGTH_LONG).show();
                     return;
                 }
-                // add method to check pwd and pwd2 match
-                // http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20name=aamir&email=aa@gmail.com&mobile=555454545465&password=7011
-                String url = REGISTER_URL + "name=" + username
-                        + "&email=" + email + "&mobile=" + mobile
-                        + "&password=" + pwd;
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String s) {
-                                if (s.contains("successfully")) {
-                                    mSPManipulation.clearSharedPreference(SignUpActivity.this);
-                                    mSPManipulation.saveName(username);
-                                    mSPManipulation.saveMobile(mobile);
-                                    mSPManipulation.saveEmail(email);
-                                    mSPManipulation.savePwd(pwd);
-                                    Intent i = new Intent(SignUpActivity.this, MainActivity.class);
-                                    startActivity(i);
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(SignUpActivity.this, "network error!", Toast.LENGTH_LONG).show();
-                    }
-                });
-                mRequestQueue.add(stringRequest);
+
+                client.setPrimeiro_nome(firstName);
+                client.setApelido(lastName);
+                client.setMail(email);
+                client.setPassword(pwd);
+                client.setContacto(phone);
+                Intent i = new Intent(SignUpActivity.this, SignUpActivity2.class);
+                i.putExtra("client",client);
+                startActivityForResult(i,1);
+
             }
         });
         mTextSignIn = (TextView) findViewById(R.id.to_sign_in);
@@ -89,6 +82,27 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Client c = (Client) data.getSerializableExtra("client");
+            this.client = c;
+        }
+    }
+/*
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTextfirstName.setText(client.getPrimeiro_nome());
+        mTextlastName.setText(client.getApelido());
+        mTextEmail.setText(client.getMail());
+        mTextPhone.setText(client.getContacto());
+        mTextPwd.setText(client.getPassword());
+        mTextRePwd.setText(client.getPassword());
+    }*/
+
     private boolean pwdMatch(String pwd, String pwd2) {
         return pwd.equals(pwd2);
     }

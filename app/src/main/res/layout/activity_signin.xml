@@ -24,13 +24,15 @@
             android:layout_width="match_parent"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
-            android:hint="Phone number"
+            android:layout_marginTop="30dp"
+            android:hint="E-mail"
             android:layout_height="wrap_content"/>
     <EditText
             android:id="@+id/sign_in_password"
             android:fontFamily="sans-serif-light"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
+            android:layout_marginTop="30dp"
             android:hint="Password"
             android:ems="10"
             android:layout_width="match_parent"
@@ -40,6 +42,7 @@
             android:fontFamily="sans-serif-light"
             android:layout_gravity="end"
             android:paddingEnd="32dp"
+            android:layout_marginTop="20dp"
             android:text="Forgot password?"
             android:textSize="12dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -51,6 +54,7 @@
             android:textColor="#fff"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
+            android:layout_marginTop="20dp"
             android:backgroundTint="@color/colorPrimary"
             android:layout_width="match_parent"
             android:layout_height="60dp"/>
@@ -59,62 +63,19 @@
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
             android:layout_height="wrap_content">
-        <TextView
-                android:layout_gravity="center"
-                android:text="Don't have an account? "
-                android:textSize="12dp"
-                android:fontFamily="sans-serif-light"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+
         <TextView
                 android:id="@+id/to_sign_up"
                 android:clickable="true"
-                android:textSize="12dp"
-                android:text="Sign up"
+                android:textSize="15dp"
+                android:text="Don't have an account? Sign up"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:layout_marginTop="8dp"
-                android:background="@android:color/darker_gray"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:text="or"/>
-        <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:layout_marginTop="8dp"
-                android:background="@android:color/darker_gray"/>
-    </LinearLayout>
-    <Button
-            android:layout_gravity="center"
-            android:id="@+id/button_fb_sign_in"
-            android:text="Connect with Facebook"
-            android:textColor="@color/icons"
-            android:fontFamily="sans-serif-black"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:backgroundTint="#565fa0"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"/>
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:fontFamily="sans-serif-light"
-            android:textSize="12dp"
-            android:text="We will never publish on your facebook"/>
+
+
+
+
 </LinearLayout>

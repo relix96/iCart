@@ -1,10 +1,12 @@
 package com.example.guanzhuli.icart.data;
 
 
+import java.io.Serializable;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class Client {
+public class Client implements Serializable {
 
     private Integer id;
     private String primeiro_nome;
@@ -13,11 +15,11 @@ public class Client {
     private String mail;
     private String password;
 
-    // private MoradaData morada;
-    //private SessaoData sessao;
+    private MoradaData morada;
+    private SessaoData sessao;
 
 
-   /* public SessaoData getSessao() {
+  public SessaoData getSessao() {
         return sessao;
     }
 
@@ -31,7 +33,7 @@ public class Client {
 
     public void setMorada(MoradaData morada) {
         this.morada = morada;
-    }*/
+    }
 
 
 
@@ -109,11 +111,11 @@ public class Client {
     }
 
 
-    /*public ClienteData(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password, MoradaData morada ,SessaoData sessao) {
+    public Client(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password, MoradaData morada ,SessaoData sessao) {
         this(id,primeiro_nome,apelido,contacto,mail,password);
         this.morada = morada;
         this.sessao = sessao;
-    }*/
+    }
 
     @Override
     public String toString() {

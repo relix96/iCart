@@ -51,10 +51,6 @@ import retrofit2.Callback;
 // http://rjtmobile.com/ansari/shopingcart/androidapp/shop_login.php?mobile=123456&password=ansari
 public class SignInActivity extends AppCompatActivity {
 
-    ClientService clientService;
-    String cookie;
-
-    private static final String LOGIN_URL = "http://192.168.80.1:8080/user/login/cliente/";
     private LoginButton mLoginButton;
     private CallbackManager callbackManager;
     private Button mButtonSignIn;
@@ -63,7 +59,6 @@ public class SignInActivity extends AppCompatActivity {
     private AppController mController;
     private RequestQueue mRequestQueue;
     private SPManipulation mSPManipulation;
-    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,60 +96,7 @@ public class SignInActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        mLoginButton = new LoginButton(this);
-        mLoginButton.setReadPermissions("email");
-        callbackManager = CallbackManager.Factory.create();
-        mLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.e("fblogin", "success");
-                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                try {
 
-                                    String email = object.getString("email");
-                                    Log.e("fblogin", email);
-                                    String id = object.getString("id");
-                                    Log.e("fblogin", id);
-                                    String name = object.getString("first_name").toLowerCase();
-                                    Log.e("fblogin", name);
-                                    mSPManipulation.saveName(name);
-                                    mSPManipulation.saveEmail(email);
-                                    mSPManipulation.savePwd(" ");
-                                    mSPManipulation.saveMobile(id);
-                                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,first_name,email");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
-
-            @Override
-            public void onCancel() {
-                Log.e("fblogin", "cancel");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.e("fblogin", "error");
-
-            }
-        });
-        mFbButtonSignIn = (Button)findViewById(R.id.button_fb_sign_in);
-        mFbButtonSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLoginButton.performClick();
-            }
-        });
 
     }
 
@@ -163,7 +105,6 @@ public class SignInActivity extends AppCompatActivity {
 
         final String mail = mTextUsername.getText().toString();
         final String password = mTextPassword.getText().toString();
-        String url = LOGIN_URL + mail;
         final RequestBody pwd = RequestBody.create(MediaType.parse("text/plain"),password);
 
         final String[] hashcode = {null};

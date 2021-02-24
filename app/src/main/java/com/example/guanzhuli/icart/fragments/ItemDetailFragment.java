@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,20 @@ import android.widget.Toast;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.guanzhuli.icart.CheckoutActivity;
+import com.example.guanzhuli.icart.MainActivity;
 import com.example.guanzhuli.icart.R;
-import com.example.guanzhuli.icart.data.Item;
+import com.example.guanzhuli.icart.data.CompraData;
+import com.example.guanzhuli.icart.data.CompraLinhaData;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.example.guanzhuli.icart.data.ShoppingCartList;
+import com.example.guanzhuli.icart.service.CartService;
+import com.example.guanzhuli.icart.utils.API;
 import com.example.guanzhuli.icart.utils.AppController;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.example.guanzhuli.icart.adapters.ItemGridAdapter.*;
 
@@ -34,8 +44,14 @@ public class ItemDetailFragment extends Fragment {
     private ImageLoader mImageLoader;
     private AppController mController;
     private SPManipulation mSPManipulation;
-    private Item mItem;
     private ShoppingCartList mCartList;
+    private CartService cartService;
+    private String hashcode;
+    private Integer qtdP;
+    private MainActivity main;
+    private Bundle bundle;
+    private CompraLinhaData productCart;
+    private CompraData carrinho;
 
     @Override
     public void onAttach(Context context) {
@@ -60,28 +76,33 @@ public class ItemDetailFragment extends Fragment {
         mTextPrice = (TextView) view.findViewById(R.id.item_details_price);
         mTextDescription = (TextView) view.findViewById(R.id.item_details_description);
         mImageView = (NetworkImageView)view.findViewById(R.id.item_details_image);
+        main = (MainActivity)getActivity();
+        hashcode = main.getHashcode();
         getBundleData();
         setTextViewData();
         return view;
     }
 
     private void setTextViewData() {
-        mTextId.setText("SKU: " + mItem.getId());
-        mTextName.setText(mItem.getNomeProduto());
-        mTextDescription.setText("Description: " + mItem.getDescricao());
-        mTextPrice.setText("Price: " + Double.toString(mItem.getPreco())+" €");
+        mTextName.setText(productCart.getNomeProduto());
+        mTextDescription.setText("Description: " + productCart.getDescricao());
+        mTextPrice.setText("Price: " + Double.toString(productCart.getPreco())+" €");
         //mImageView.setImageUrl(mItem.getImageurl(), mImageLoader);
     }
 
     private void getBundleData() {
-        Bundle bundle = this.getArguments();
+        bundle = this.getArguments();
         if (bundle != null) {
-            mItem = new Item();
-            mItem.setQuantidadeMinima(bundle.getInt(ITEM_MAXQUANTITY));
-            mItem.setNomeProduto(bundle.getString(ITEM_NAME));
-            mItem.setId(bundle.getInt(ITEM_ID));
-            mItem.setDescricao(bundle.getString(ITEM_DES));
-            mItem.setPreco(bundle.getDouble(ITEM_PRICE));
+            productCart = new CompraLinhaData();
+            carrinho = new CompraData();
+            productCart.setIdProduto(bundle.getInt(ITEM_ID));
+            productCart.setNomeProduto(bundle.getString(ITEM_NAME));
+            productCart.setPorcao(bundle.getString(ITEM_PORTION));
+            productCart.setPorcaoPack(bundle.getString(ITEM_PORTIONPACK));
+            productCart.setPreco(bundle.getDouble(ITEM_PRICE));
+            productCart.setPrecoPack(bundle.getDouble(ITEM_PACKPRICE));
+            productCart.setQuantidadeMinima(bundle.getInt(ITEM_MINQUANTITY));
+            productCart.setDescricao(bundle.getString(ITEM_DES));
             //mItem.setImageurl(bundle.getString(ITEM_IMAGEURL));
         }
     }
@@ -92,54 +113,64 @@ public class ItemDetailFragment extends Fragment {
         mButtonQuantAdd = (ImageButton) getView().findViewById(R.id.button_quantity_add);
         mButtonQuantMinus = (ImageButton) getView().findViewById(R.id.button_quantity_minus);
         mTextQuant = (TextView) getView().findViewById(R.id.item_details_quant);
-        // final int quant  = Integer.valueOf(mTextQuant.getText().toString());
+        mTextQuant.setText(String.valueOf(productCart.getQuantidadeMinima()));
         mButtonQuantAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int quant  = Integer.valueOf(mTextQuant.getText().toString());
-                if (quant + 1 > mItem.getQuantidadeMinima()) {
-                    Toast.makeText(getContext(), "Exceeds the stock limit", Toast.LENGTH_SHORT).show();
-                } else {
-                    mTextQuant.setText(String.valueOf(quant + 1));
-                }
+                mTextQuant.setText(String.valueOf(quant + 1));
             }
         });
         mButtonQuantMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int quant  = Integer.valueOf(mTextQuant.getText().toString());
-                if (quant > 0) {
+                if (quant > productCart.getQuantidadeMinima()) {
                     mTextQuant.setText(String.valueOf(quant - 1));
                 } else {
+                    Toast.makeText(getContext(), "Quantidade minima atingida! ", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
         });
         mButtonAddCart = (Button) getView().findViewById(R.id.add_cart);
-/*
+
         mButtonAddCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = mSPManipulation.getName();
-                String mobile = mSPManipulation.getMobile();
-               // mDBManipulation = DBManipulation.getInstance(getContext(), name + mobile);
-                // add current quant
-                int curQuant = Integer.valueOf(mTextQuant.getText().toString());
-               // int prevQuant = mDBManipulation.getQuantity(mItem.getId());
-                if (prevQuant != 0) {
-                    if (prevQuant + curQuant > mItem.getMaxQuant()) {
-                        Toast.makeText(getContext(), "Exceeds the stock limit", Toast.LENGTH_LONG).show();
-                        return;
+                cartService = API.getCartService();
+                productCart.setQuantidade(Integer.valueOf(mTextQuant.getText().toString()));
+                Log.d("Linha: ",productCart.toString());
+                Call<ResponseBody> call = cartService.addCart(productCart,hashcode);
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if(response.isSuccessful()){
+                            try{
+                                Integer qtdP =  Integer.valueOf(mTextQuant.getText().toString());
+                                if (qtdP >= productCart.getQuantidadeMinima()) {
+                                    main.getCountProducts();
+                                    Toast.makeText(getContext(),productCart.getNomeProduto()+" adicionado ao carrinho!",Toast.LENGTH_SHORT).show();
+
+                                }
+                                else{
+                                    Toast.makeText(getContext(),"Quantidade incorreta!",Toast.LENGTH_SHORT).show();
+                                }
+
+                            }catch (Exception e){
+                                Log.d("Error: ",e.getMessage());
+                            }
+                        }
+
                     }
-                    mDBManipulation.update(mItem.getId(), prevQuant + curQuant);
-                } else {
-                    mItem.setQuantity(curQuant);
-                    mDBManipulation.insert(mItem);
-                }
-                TextView textAmount = (TextView) getActivity().findViewById(R.id.cart_amount);
-                textAmount.setText(Integer.toString(mDBManipulation.getRecordNumber()));
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
             }
-        });*/
+        });
         mButtonChceckout = (Button) getView().findViewById(R.id.checkout);
         mButtonChceckout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,7 +179,7 @@ public class ItemDetailFragment extends Fragment {
                 // mCartList.add(mItem);
                 Intent i = new Intent(getContext(), CheckoutActivity.class);
                 i.putExtra("SingleItem", true);
-                i.putExtra("CheckoutItem", mItem);
+                i.putExtra("CheckoutItem", productCart);
                 startActivity(i);
             }
         });

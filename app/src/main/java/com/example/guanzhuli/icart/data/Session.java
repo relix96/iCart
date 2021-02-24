@@ -3,7 +3,7 @@ package com.example.guanzhuli.icart.data;
 
 import java.util.Date;
 
-public class SessaoData {
+public class Session {
 
 	private String id;
 	private Date data_fim;
@@ -18,11 +18,11 @@ public class SessaoData {
 		this.id = id;
 	}
 
-	public SessaoData() {
+	public Session() {
 		super();
 	}
 
-	public SessaoData(String id,Date data_fim, Integer idCliente) {
+	public Session(String id, Date data_fim, Integer idCliente) {
 		super();
 		this.id = id;
 		this.data_fim = data_fim;

@@ -63,6 +63,7 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListViewHolder>{
                 int temp = mItemArrayList.get(position).getQuantidadeMinima();
                 temp++;
                 if (temp > mItemArrayList.get(position).getQuantidadeMinima()) {
+                    //is accept
                     Toast.makeText(mContext, "Exceeds the stock limit", Toast.LENGTH_LONG ).show();
                     return;
                 }

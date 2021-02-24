@@ -5,7 +5,8 @@ import java.io.Serializable;
 /**
  * Created by Guanzhu Li on 12/31/2016.
  */
-public class Item implements Serializable {private Integer id;
+public class Item implements Serializable {
+    private Integer id;
     private String nomeProduto;
     private Double preco;
     private Double precoPack;

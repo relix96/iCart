@@ -15,6 +15,7 @@ public class  SPManipulation {
     public static final String PREFS_KEY_PWD = "PWD";
     public static final String PREFS_KEY_EMAIL = "EMAIL";
     public static final String PREFS_USER_KEY = "USER_INFOR";
+    public static final String HASHCODE = "HASHCODE";
     Context mContext;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
@@ -47,6 +48,12 @@ public class  SPManipulation {
     public void savePwd(String text) {
         editor = settings.edit(); //2
         editor.putString(PREFS_KEY_PWD, text); //3
+        editor.commit(); //4
+    }
+
+    public void saveHashCode(String text) {
+        editor = settings.edit(); //2
+        editor.putString(HASHCODE, text); //3
         editor.commit(); //4
     }
 
@@ -100,6 +107,10 @@ public class  SPManipulation {
 
     public String getPwd() {
         return settings.getString(PREFS_KEY_PWD, null);
+    }
+
+    public String getHashcode() {
+        return settings.getString(HASHCODE, null);
     }
 
     public void clearSharedPreference(Context context) {

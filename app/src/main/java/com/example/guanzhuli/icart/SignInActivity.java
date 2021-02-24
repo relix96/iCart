@@ -117,10 +117,12 @@ public class SignInActivity extends AppCompatActivity {
                     try {
                         hashcode[0] = response.body().string();
                         Toast.makeText(SignInActivity.this, hashcode[0], Toast.LENGTH_LONG).show();
+                        //call the API to store the client object on mSPManipulation
                         mSPManipulation.saveName(mail);
                         mSPManipulation.saveEmail(mail);
                         mSPManipulation.savePwd(password);
                         mSPManipulation.saveMobile(mail);
+                        mSPManipulation.saveHashCode(hashcode[0]);
                         Intent i = new Intent(SignInActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
@@ -131,7 +133,11 @@ public class SignInActivity extends AppCompatActivity {
                 }
 
                 else {
-                    Toast.makeText(SignInActivity.this,response.errorBody().toString(), Toast.LENGTH_LONG).show();
+                    try {
+                        Toast.makeText(SignInActivity.this,response.body().string(), Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
 

@@ -11,28 +11,25 @@ import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.example.guanzhuli.icart.data.Client;
+import com.example.guanzhuli.icart.data.ClientData;
 import com.example.guanzhuli.icart.data.MoradaData;
 import com.example.guanzhuli.icart.data.SPManipulation;
 
 
-// url
-// http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20name=aamir&email=aa@gmail.com&mobile=555454545465&password=7011
 public class SignUpActivity extends AppCompatActivity {
-    private static final String REGISTER_URL = "http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20";
     private TextView mTextfirstName, mTextlastName, mTextEmail, mTextPwd, mTextRePwd, mTextSignIn, mTextPhone;
     private Button mButtonContinue;
     private RequestQueue mRequestQueue;
     private SPManipulation mSPManipulation;
-    private Client client;
+    private ClientData clientData;
     private MoradaData morada;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        client = new Client();
+        clientData = new ClientData();
         morada = new MoradaData();
-        client.setMorada(morada);
+        clientData.setMorada(morada);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
@@ -61,16 +58,16 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.makeText(SignUpActivity.this, "Password does not match!", Toast.LENGTH_LONG).show();
                     return;
                 }
-
-                client.setPrimeiro_nome(firstName);
-                client.setApelido(lastName);
-                client.setMail(email);
-                client.setPassword(pwd);
-                client.setContacto(phone);
-                Intent i = new Intent(SignUpActivity.this, SignUpActivity2.class);
-                i.putExtra("client",client);
-                startActivityForResult(i,1);
-
+                else {
+                    clientData.setPrimeiro_nome(firstName);
+                    clientData.setApelido(lastName);
+                    clientData.setMail(email);
+                    clientData.setPassword(pwd);
+                    clientData.setContacto(phone);
+                    Intent i = new Intent(SignUpActivity.this, SignUpActivity2.class);
+                    i.putExtra("client", clientData);
+                    startActivityForResult(i,1);
+                }
             }
         });
         mTextSignIn = (TextView) findViewById(R.id.to_sign_in);
@@ -87,24 +84,18 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            Client c = (Client) data.getSerializableExtra("client");
-            this.client = c;
+            ClientData c = (ClientData) data.getSerializableExtra("client");
+            this.clientData = c;
         }
     }
-/*
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mTextfirstName.setText(client.getPrimeiro_nome());
-        mTextlastName.setText(client.getApelido());
-        mTextEmail.setText(client.getMail());
-        mTextPhone.setText(client.getContacto());
-        mTextPwd.setText(client.getPassword());
-        mTextRePwd.setText(client.getPassword());
-    }*/
 
     private boolean pwdMatch(String pwd, String pwd2) {
-        return pwd.equals(pwd2);
+        if(pwd.equals(pwd2) && pwd.length()>= 6){
+            return true;
+        }
+
+        else
+            return false;
     }
 
     private boolean checkUsername(String username) {

@@ -54,11 +54,15 @@ public class ItemListAdapter extends RecyclerView.Adapter<ListViewHolder>{
             public void onClick(View view) {
                 ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
                 Bundle bundle = new Bundle();
+                bundle.putInt(ITEM_ID, mItemArrayList.get(position).getId());
                 bundle.putString(ITEM_NAME, mItemArrayList.get(position).getNomeProduto());
                 bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescricao());
                 bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());
-                bundle.putInt(ITEM_MAXQUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
+                bundle.putInt(ITEM_MINQUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
                 bundle.putDouble(ITEM_PRICE, mItemArrayList.get(position).getPreco());
+                bundle.putDouble(ITEM_PACKPRICE, mItemArrayList.get(position).getPrecoPack());
+                bundle.putString(ITEM_PORTION, mItemArrayList.get(position).getPorcao());
+                bundle.putString(ITEM_PORTIONPACK, mItemArrayList.get(position).getPorcaoPack());
                 itemDetailFragment.setArguments(bundle);
                 AppCompatActivity activity = (AppCompatActivity) view.getContext();
                 activity.getSupportFragmentManager()

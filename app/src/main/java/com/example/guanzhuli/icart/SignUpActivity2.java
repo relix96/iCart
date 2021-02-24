@@ -16,20 +16,24 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.guanzhuli.icart.data.Client;
-import com.example.guanzhuli.icart.data.MoradaData;
+import com.example.guanzhuli.icart.data.ClientData;
 import com.example.guanzhuli.icart.data.SPManipulation;
+import com.example.guanzhuli.icart.service.ClientService;
+import com.example.guanzhuli.icart.utils.API;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 
-// url
-// http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20name=aamir&email=aa@gmail.com&mobile=555454545465&password=7011
 public class SignUpActivity2 extends AppCompatActivity {
-    private static final String REGISTER_URL = "http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20";
     private TextView mTextAddress, mTextpostCode, mTextCity, mTextPwd, mTextRePwd, mTextSignIn;
     private Button mButtonSignUp;
     private RequestQueue mRequestQueue;
     private SPManipulation mSPManipulation;
-    private Client client;
+    private ClientData client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +46,7 @@ public class SignUpActivity2 extends AppCompatActivity {
         mTextCity = (TextView) findViewById(R.id.sign_up_City);
         mButtonSignUp = (Button) findViewById(R.id.button_signIn);
 
-        client = (Client) getIntent().getSerializableExtra("client");
-
-        Log.d("cliente", client.toString());
+        client = (ClientData) getIntent().getSerializableExtra("client");
 
         ImageButton back1 = (ImageButton) findViewById(R.id.backToMain);
         back1.setOnClickListener(new View.OnClickListener() {
@@ -65,45 +67,66 @@ public class SignUpActivity2 extends AppCompatActivity {
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String username = mTextAddress.getText().toString();
+                final String address = mTextAddress.getText().toString();
                 // add method to check illegal character
-                final String mobile = mTextpostCode.getText().toString();
+                final String postCode = mTextpostCode.getText().toString();
                 // add method to check all are numbers
-                final String email = mTextCity.getText().toString();
+                final String City = mTextCity.getText().toString();
                 // add method to check email format
-                final String pwd = mTextPwd.getText().toString();
-                String pwd2 = mTextRePwd.getText().toString();
-                if (!pwdMatch(pwd, pwd2)) {
-                    Toast.makeText(SignUpActivity2.this, "Password does not match!", Toast.LENGTH_LONG).show();
-                    return;
+
+                client.getMorada().setMorada_1(mTextAddress.getText().toString());
+                client.getMorada().setCod_postal(mTextpostCode.getText().toString());
+                client.getMorada().setLocalidade(mTextCity.getText().toString());
+                try{
+                    register(client);
                 }
-                // add method to check pwd and pwd2 match
-                // http://rjtmobile.com/ansari/shopingcart/androidapp/shop_reg.php?%20name=aamir&email=aa@gmail.com&mobile=555454545465&password=7011
-                String url = REGISTER_URL + "name=" + username
-                        + "&email=" + email + "&mobile=" + mobile
-                        + "&password=" + pwd;
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String s) {
-                                if (s.contains("successfully")) {
-                                    mSPManipulation.clearSharedPreference(SignUpActivity2.this);
-                                    mSPManipulation.saveName(username);
-                                    mSPManipulation.saveMobile(mobile);
-                                    mSPManipulation.saveEmail(email);
-                                    mSPManipulation.savePwd(pwd);
-                                    Intent i = new Intent(SignUpActivity2.this, MainActivity.class);
-                                    startActivity(i);
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(SignUpActivity2.this, "network error!", Toast.LENGTH_LONG).show();
-                    }
-                });
+                catch (Exception e)
+                {
+                    Log.e("Error: ", e.toString());
+                }
+
+
             }
         });
+
+    }
+
+    public void register(final ClientData client){
+        final String[] hashcode = {null};
+        ClientService clientService;
+        clientService = API.getClientService();
+        Call<ResponseBody> call = clientService.createClient(client);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        hashcode[0] = response.body().string();
+                        Toast.makeText(SignUpActivity2.this, hashcode[0], Toast.LENGTH_LONG).show();
+                        mSPManipulation.saveName(client.getPrimeiro_nome() + " " + client.getApelido());
+                        mSPManipulation.saveEmail(client.getMail());
+                        mSPManipulation.savePwd(client.getPassword());
+                        mSPManipulation.saveMobile(client.getContacto());
+                        mSPManipulation.saveHashCode(hashcode[0]);
+                        Intent i = new Intent(SignUpActivity2.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    Toast.makeText(SignUpActivity2.this,response.errorBody().toString(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+
 
     }
 
@@ -115,19 +138,4 @@ public class SignUpActivity2 extends AppCompatActivity {
         mTextCity.setText(  client.getMorada().getLocalidade());
     }
 
-    private boolean pwdMatch(String pwd, String pwd2) {
-        return pwd.equals(pwd2);
-    }
-
-    private boolean checkUsername(String username) {
-        return true;
-    }
-
-    private boolean checkMobile(String mobile) {
-        return true;
-    }
-
-    private boolean checkEmail(String email) {
-        return true;
-    }
 }

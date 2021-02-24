@@ -3,10 +3,7 @@ package com.example.guanzhuli.icart.data;
 
 import java.io.Serializable;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-public class Client implements Serializable {
+public class ClientData implements Serializable {
 
     private Integer id;
     private String primeiro_nome;
@@ -16,14 +13,14 @@ public class Client implements Serializable {
     private String password;
 
     private MoradaData morada;
-    private SessaoData sessao;
+    private Session sessao;
 
 
-  public SessaoData getSessao() {
+  public Session getSessao() {
         return sessao;
     }
 
-    public void setSessao(SessaoData sessao) {
+    public void setSessao(Session sessao) {
         this.sessao = sessao;
     }
 
@@ -88,12 +85,12 @@ public class Client implements Serializable {
     }
 
 
-    public Client() {
+    public ClientData() {
         super();
     }
 
 
-    public Client(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password) {
+    public ClientData(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password) {
         super();
         this.id = id;
         this.primeiro_nome = primeiro_nome;
@@ -104,14 +101,14 @@ public class Client implements Serializable {
 
     }
 
-    public Client(String mail, String password) {
+    public ClientData(String mail, String password) {
         this.mail = mail;
         this.password = password;
 
     }
 
 
-    public Client(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password, MoradaData morada ,SessaoData sessao) {
+    public ClientData(Integer id, String primeiro_nome, String apelido, String contacto, String mail, String password, MoradaData morada , Session sessao) {
         this(id,primeiro_nome,apelido,contacto,mail,password);
         this.morada = morada;
         this.sessao = sessao;

@@ -25,8 +25,13 @@ import java.util.List;
 public class ItemGridAdapter extends RecyclerView.Adapter<GridViewHolder> {
     public static final String ITEM_ID = "id";
     public static final String ITEM_NAME = "name";
-    public static final String ITEM_MAXQUANTITY = "quantity";
     public static final String ITEM_PRICE = "price";
+    public static final String ITEM_PACKPRICE = "packPrice";
+    public static final String ITEM_PORTION = "portion";
+    public static final String ITEM_PORTIONPACK = "portionPack";
+    public static final String ITEM_QUANTITY = "quantity";
+    public static final String ITEM_QUANTITYPACK = "quantityPack";
+    public static final String ITEM_MINQUANTITY = "minQuantity";
     public static final String ITEM_DES = "description";
     public static final String ITEM_IMAGEURL = "image_url";
     private Context mContext;
@@ -59,10 +64,16 @@ public class ItemGridAdapter extends RecyclerView.Adapter<GridViewHolder> {
             public void onClick(View view) {
                 ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
                 Bundle bundle = new Bundle();
+                bundle.putInt(ITEM_ID, mItemArrayList.get(position).getId());
                 bundle.putString(ITEM_NAME, mItemArrayList.get(position).getNomeProduto());
+                bundle.putString(ITEM_PORTION, mItemArrayList.get(position).getPorcao());
+                bundle.putString(ITEM_PORTIONPACK, mItemArrayList.get(position).getPorcaoPack());
+                bundle.putDouble(ITEM_PRICE, mItemArrayList.get(position).getPreco());
+                bundle.putDouble(ITEM_PACKPRICE, mItemArrayList.get(position).getPrecoPack());
+                bundle.putDouble(ITEM_MINQUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
                 bundle.putString(ITEM_DES, mItemArrayList.get(position).getDescricao());
                 //bundle.putString(ITEM_IMAGEURL, mItemArrayList.get(position).getImageurl());
-                bundle.putInt(ITEM_MAXQUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
+                bundle.putInt(ITEM_QUANTITY, mItemArrayList.get(position).getQuantidadeMinima());
                 bundle.putDouble(ITEM_PRICE, mItemArrayList.get(position).getPreco());
                 itemDetailFragment.setArguments(bundle);
                 AppCompatActivity activity = (AppCompatActivity) view.getContext();

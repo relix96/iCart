@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -21,12 +22,25 @@ import android.widget.TextView;
 
 import com.example.guanzhuli.icart.fragments.*;
 import com.example.guanzhuli.icart.data.SPManipulation;
+import com.example.guanzhuli.icart.service.CartService;
+import com.example.guanzhuli.icart.utils.API;
+import com.example.guanzhuli.icart.utils.Client;
 import com.facebook.login.LoginManager;
+
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private SPManipulation mSPManipulation;
+    private String hashcode;
+    private CartService cartService;
+    private TextView txtAmount;
 
 
     @Override
@@ -36,7 +50,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
             this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -48,11 +61,16 @@ public class MainActivity extends AppCompatActivity
         mSPManipulation = SPManipulation.getInstance(this);
         TextView textName = (TextView) hView.findViewById(R.id.header_username);
         String name = mSPManipulation.getName();
+        hashcode = mSPManipulation.getHashcode();
         textName.setText(name);
         TextView textEmail = (TextView) hView.findViewById(R.id.header_email);
         textEmail.setText(mSPManipulation.getEmail());
 
+       txtAmount = (TextView) findViewById(R.id.cart_amount);
+
         navigationView.setNavigationItemSelectedListener(this);
+
+        getCountProducts();
 
         if(findViewById(R.id.main_fragment_container) != null) {
             HomeFragment homeFragment = new HomeFragment();
@@ -110,6 +128,42 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
+    }
+
+    public String getHashcode(){
+        return this.hashcode;
+    }
+
+    public void getCountProducts(){
+        cartService = API.getCartService();
+        Call<ResponseBody> call = cartService.countProductsCart(this.hashcode);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()){
+                    try {
+                        Integer count = Integer.valueOf(response.body().string());
+                        txtAmount.setText(String.valueOf(count));
+                    } catch (IOException e) {
+                        Log.d("Error",e.getMessage());
+                    }
+
+                }
+                else {
+                    try {
+                        Log.d("Error", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
     }
 

@@ -9,7 +9,7 @@ public class CompraData {
 	private Integer id;
 	private Integer idCliente;
 	private Date DataCompra;
-	private Integer idMoradaHist;
+	private Double precoTotal;
 	private List<CompraLinhaData> linhas = new ArrayList<CompraLinhaData>();
 	
 	public Integer getId() {
@@ -30,17 +30,10 @@ public class CompraData {
 	public void setDataCompra(Date dataCompra) {
 		DataCompra = dataCompra;
 	}
-	
-	public Integer getIdMorada_hist() {
-		return idMoradaHist;
-	}
-	public void setIdMorada_hist(Integer idMorada_hist) {
-		idMoradaHist = idMorada_hist;
-	}
-	
+
 	@Override
 	public String toString() {
-		return "CompraData [id=" + id + ", idCliente=" + idCliente + ", DataCompra=" + DataCompra + "idMoradaHist="+ idMoradaHist+"]";
+		return "CompraData [id=" + id + ", idCliente=" + idCliente + ", DataCompra=" + DataCompra +"]";
 	}
 	
 	public CompraData() {
@@ -48,12 +41,11 @@ public class CompraData {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public CompraData(Integer id, Integer idCliente, Date dataCompra, Integer IdMorada, Integer idMoradaHist) {
+	public CompraData(Integer id, Integer idCliente, Date dataCompra, Integer IdMorada) {
 		super();
 		this.id = id;
 		this.idCliente = idCliente;
 		this.DataCompra = dataCompra;
-		this.idMoradaHist = idMoradaHist;
 	}
 	
 	public CompraData(Integer id, Integer idCliente) {

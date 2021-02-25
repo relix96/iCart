@@ -4,19 +4,21 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class CompraLinhaData implements Serializable {
-	
-	
-    private Integer idProduto;
-    private String nomeProduto;
-    private Double preco;
-    private Double precoPack;
-    private String porcao;
-    private String porcaoPack;
-    private Integer quantidade;
-    private Integer quantidadePack;
-    private Integer quantidadeMinima;
-    private Integer versao;    
+
+
+
+	private Integer idProduto;
+	private String nomeProduto;
+	private BigDecimal preco;
+	private BigDecimal precoPack;
+	private String porcao;
+	private String porcaoPack;
+	private Integer quantidade;
+	private Integer quantidadePack;
+	private Integer quantidadeMinima;
+	private Integer versao;
 	private String descricao;
+	private Integer idCompra;
 
 	public final static BigDecimal IVA = new BigDecimal(0.06);
 
@@ -26,7 +28,7 @@ public class CompraLinhaData implements Serializable {
 	public void setIdProduto(Integer idProduto) {
 		this.idProduto = idProduto;
 	}
-	
+
 	public String getPorcao() {
 		return porcao;
 	}
@@ -38,6 +40,15 @@ public class CompraLinhaData implements Serializable {
 	}
 	public void setPorcaoPack(String porcaoPack) {
 		this.porcaoPack = porcaoPack;
+	}
+
+
+	public Integer getIdCompra() {
+		return idCompra;
+	}
+
+	public void setIdCompra(Integer idCompra) {
+		this.idCompra = idCompra;
 	}
 
 	public Integer getQuantidade() {
@@ -56,7 +67,7 @@ public class CompraLinhaData implements Serializable {
 		this.quantidadePack = quantidadePack;
 	}
 
-	
+
 	public Integer getVersao() {
 		return versao;
 	}
@@ -64,7 +75,7 @@ public class CompraLinhaData implements Serializable {
 	public void setVersao(Integer versao) {
 		this.versao = versao;
 	}
-	
+
 	public String getDescricao() {
 		return descricao;
 	}
@@ -81,19 +92,19 @@ public class CompraLinhaData implements Serializable {
 		this.nomeProduto = nomeProduto;
 	}
 
-	public Double getPreco() {
+	public BigDecimal getPreco() {
 		return preco;
 	}
 
-	public void setPreco(Double preco) {
+	public void setPreco(BigDecimal preco) {
 		this.preco = preco;
 	}
 
-	public Double getPrecoPack() {
+	public BigDecimal getPrecoPack() {
 		return precoPack;
 	}
 
-	public void setPrecoPack(Double precoPack) {
+	public void setPrecoPack(BigDecimal precoPack) {
 		this.precoPack = precoPack;
 	}
 
@@ -105,6 +116,29 @@ public class CompraLinhaData implements Serializable {
 		this.quantidadeMinima = quantidadeMinima;
 	}
 
+	public BigDecimal getPrecoIVA() {
+		return (getPreco() != null ? preco : BigDecimal.ZERO).multiply(BigDecimal.ONE.add(IVA));
+	}
+
+	public BigDecimal getPrecoPackIVA() {
+		return (getPrecoPack() != null ? preco : BigDecimal.ZERO).multiply(BigDecimal.ONE.add(IVA));
+	}
+
+	public BigDecimal getPrecoTotal() {
+		return (preco != null ? preco : BigDecimal.ZERO).multiply(quantidade != null ? new BigDecimal(quantidade) : BigDecimal.ZERO)
+				.add((precoPack != null ? precoPack : BigDecimal.ZERO).multiply(quantidadePack != null ? new BigDecimal(quantidadePack) : BigDecimal.ZERO));
+	}
+
+	public BigDecimal getTaxaTotal() {
+		return getPrecoTotal().multiply(IVA);
+	}
+
+	public BigDecimal getPrecoFinal() {
+		return getPrecoTotal().multiply(BigDecimal.ONE.add(IVA));
+	}
+
+
+
 
 	public CompraLinhaData(Integer idProduto, Integer versao, String nomeProduto, Double preco, Double precoPack,
 						   String porcao, String porcaoPack, Integer quantidadeMinima, Integer quantidade, Integer quantidadePack, String descricao) {
@@ -112,8 +146,8 @@ public class CompraLinhaData implements Serializable {
 		this.idProduto = idProduto;
 		this.versao = versao;
 		this.nomeProduto = nomeProduto;
-		this.preco = preco;
-		this.precoPack = precoPack;
+		this.preco = BigDecimal.valueOf( preco);
+		this.precoPack = BigDecimal.valueOf(precoPack);
 		this.porcao = porcao;
 		this.porcaoPack = porcaoPack;
 		this.quantidadeMinima = quantidadeMinima;
@@ -122,25 +156,25 @@ public class CompraLinhaData implements Serializable {
 		this.descricao = descricao;
 	}
 
-	@Override
-	public String toString() {
-		return "CompraLinhaData{" +
-				"idProduto=" + idProduto +
-				", nomeProduto='" + nomeProduto + '\'' +
-				", preco=" + preco +
-				", precoPack=" + precoPack +
-				", porcao='" + porcao + '\'' +
-				", porcaoPack='" + porcaoPack + '\'' +
-				", quantidade=" + quantidade +
-				", quantidadePack=" + quantidadePack +
-				", quantidadeMinima=" + quantidadeMinima +
-				", versao=" + versao +
-				", descricao='" + descricao + '\'' +
-				'}';
-	}
+	public CompraLinhaData(Integer idCarrinho, Integer idProduto, Integer quantidade, Integer quantidadePack) {
+		super();
 
+		this.idCompra = idCarrinho;
+		this.idProduto = idProduto;
+		this.quantidade = quantidade;
+		this.quantidadePack = quantidadePack;
+		// TODO Auto-generated constructor stub
+	}
 	public CompraLinhaData(){
 		super();
 	}
-	
+	@Override
+	public String toString() {
+		return "LinhaData [precoFinal="+getPrecoFinal()+", idProduto=" + idProduto + ", nomeProduto=" + nomeProduto + ", preco" + preco + ", precoPack="
+				+ precoPack + ", porcao=" + porcao + ", porcaoPack=" + porcaoPack + ", quantidade=" + quantidade
+				+ ", quantidadePack=" + quantidadePack + ", QuantidadeMinima=" + quantidadeMinima + ", versao=" + versao + ", idCarrinho="
+				+ idCompra + ", descricao=" + descricao + "]";
+	}
+
+
 }

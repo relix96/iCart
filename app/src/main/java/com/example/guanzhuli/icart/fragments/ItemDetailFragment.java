@@ -26,6 +26,8 @@ import com.example.guanzhuli.icart.service.CartService;
 import com.example.guanzhuli.icart.utils.API;
 import com.example.guanzhuli.icart.utils.AppController;
 
+import java.math.BigDecimal;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -86,7 +88,7 @@ public class ItemDetailFragment extends Fragment {
     private void setTextViewData() {
         mTextName.setText(productCart.getNomeProduto());
         mTextDescription.setText("Description: " + productCart.getDescricao());
-        mTextPrice.setText("Price: " + Double.toString(productCart.getPreco())+" €");
+        mTextPrice.setText("Price: " + Double.parseDouble(productCart.getPreco().toString())+" €");
         //mImageView.setImageUrl(mItem.getImageurl(), mImageLoader);
     }
 
@@ -99,8 +101,8 @@ public class ItemDetailFragment extends Fragment {
             productCart.setNomeProduto(bundle.getString(ITEM_NAME));
             productCart.setPorcao(bundle.getString(ITEM_PORTION));
             productCart.setPorcaoPack(bundle.getString(ITEM_PORTIONPACK));
-            productCart.setPreco(bundle.getDouble(ITEM_PRICE));
-            productCart.setPrecoPack(bundle.getDouble(ITEM_PACKPRICE));
+            productCart.setPreco(BigDecimal.valueOf(bundle.getDouble(ITEM_PRICE)));
+            productCart.setPrecoPack(BigDecimal.valueOf(bundle.getDouble(ITEM_PACKPRICE)));
             productCart.setQuantidadeMinima(bundle.getInt(ITEM_MINQUANTITY));
             productCart.setDescricao(bundle.getString(ITEM_DES));
             //mItem.setImageurl(bundle.getString(ITEM_IMAGEURL));

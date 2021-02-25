@@ -2,6 +2,9 @@ package com.example.guanzhuli.icart.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.icu.math.BigDecimal;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +16,8 @@ import android.widget.Toast;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.guanzhuli.icart.R;
-import com.example.guanzhuli.icart.data.Item;
+import com.example.guanzhuli.icart.data.CompraData;
+import com.example.guanzhuli.icart.data.CompraLinhaData;
 import com.example.guanzhuli.icart.data.SPManipulation;
 import com.example.guanzhuli.icart.utils.AppController;
 
@@ -28,15 +32,17 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListViewHolder>{
     private Activity mActivity;
     private LayoutInflater inflater;
     private ImageLoader mImageLoader;
-    private List<Item> mItemArrayList;
+    private CompraData mCart;
+   // private List<CompraLinhaData> products;
     //private DBManipulation mDBManipulation;
     private SPManipulation mSPManipulation;
-    public CartListAdapter(Context context, List<Item> objects, Activity activity) {
+    public CartListAdapter(Context context, CompraData objects, Activity activity) {
         this.mActivity = activity;
         this.mContext = context;
         mImageLoader = AppController.getInstance().getImageLoader();
         inflater = LayoutInflater.from(context);
-        mItemArrayList = objects;
+        mCart = objects;
+        //products = objects.getLinhas();
         mSPManipulation = SPManipulation.getInstance(context);
         String name = mSPManipulation.getName();
         String mobile = mSPManipulation.getMobile();
@@ -52,61 +58,62 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListViewHolder>{
 
     @Override
     public void onBindViewHolder(final CartListViewHolder holder, final int position) {
-        holder.mTextCartId.setText(mItemArrayList.get(position).getId());
-        holder.mTextCartquant.setText(Integer.toString(mItemArrayList.get(position).getQuantidadeMinima()));
-        holder.mTextCartName.setText(mItemArrayList.get(position).getNomeProduto());
-        holder.mTextCartPrice.setText(Double.toString(mItemArrayList.get(position).getPreco()));
+        holder.mTextCartId.setText(mCart.getLinhas().get(position).getIdProduto());
+        holder.mTextCartquant.setText(Integer.toString(mCart.getLinhas().get(position).getQuantidadeMinima()));
+        holder.mTextCartName.setText(mCart.getLinhas().get(position).getNomeProduto());
+        holder.mTextCartPrice.setText(mCart.getLinhas().get(position).getPreco().toString());
         //holder.mImage.setImageUrl(mItemArrayList.get(position).getImageurl(), mImageLoader);
         holder.mButtonQuantAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int temp = mItemArrayList.get(position).getQuantidadeMinima();
+                int temp = mCart.getLinhas().get(position).getQuantidadeMinima();
                 temp++;
-                if (temp > mItemArrayList.get(position).getQuantidadeMinima()) {
+                if (temp > mCart.getLinhas().get(position).getQuantidadeMinima()) {
                     //is accept
                     Toast.makeText(mContext, "Exceeds the stock limit", Toast.LENGTH_LONG ).show();
                     return;
                 }
-                mItemArrayList.get(position).setQuantidadeMinima(temp);
+                mCart.getLinhas().get(position).setQuantidadeMinima(temp);
                 //mDBManipulation.update(mItemArrayList.get(position).getId().toString(), temp);
-                notifyItemChanged(position, mItemArrayList);
+                notifyItemChanged(position, mCart);
                 holder.mTextCartquant.setText(Integer.toString(temp));
                 TextView mTextTotal = (TextView) mActivity.findViewById(R.id.cart_total);
-                double result = Double.parseDouble(mTextTotal.getText().toString());
-                result += mItemArrayList.get(position).getPreco();
+                Double result = Double.parseDouble(mTextTotal.getText().toString());
+                result += Double.parseDouble(mCart.getLinhas().get(position).getPreco().toString());
                 mTextTotal.setText(String.valueOf(result));
             }
         });
         holder.mButtonQuantMinus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int temp = mItemArrayList.get(position).getQuantidadeMinima();
+                int temp = mCart.getLinhas().get(position).getQuantidadeMinima();
                 if (temp <= 0) {
                     return;
                 }
                 --temp;
                 TextView mTextTotal = (TextView) mActivity.findViewById(R.id.cart_total);
-                double result = Double.parseDouble(mTextTotal.getText().toString());
-                result -= mItemArrayList.get(position).getPreco();
+                Double result = Double.parseDouble(mTextTotal.getText().toString());
+                result -= Double.parseDouble(mCart.getLinhas().get(position).getPreco().toString());
                 mTextTotal.setText(String.valueOf(result));
-                mItemArrayList.get(position).setQuantidadeMinima(temp);
+                mCart.getLinhas().get(position).setQuantidadeMinima(temp);
                 //mDBManipulation.update(mItemArrayList.get(position).getId().toString(), temp);
-                notifyItemChanged(position, mItemArrayList);
+                notifyItemChanged(position, mCart);
                 holder.mTextCartquant.setText(Integer.toString(temp));
             }
         });
         holder.mButtonDelete.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
                 // restart the activity
                 TextView mTextTotal = (TextView) mActivity.findViewById(R.id.cart_total);
-                double result = Double.parseDouble(mTextTotal.getText().toString());
-                result -= mItemArrayList.get(position).getQuantidadeMinima() * mItemArrayList.get(position).getPreco();
+                Double result =Double.parseDouble(mTextTotal.getText().toString());
+                result -= mCart.getLinhas().get(position).getQuantidadeMinima() * Double.parseDouble(mCart.getLinhas().get(position).getPreco().toString());
                 mTextTotal.setText(String.valueOf(result));
                 //mDBManipulation.delete(mItemArrayList.get(position).getId().toString());
-                mItemArrayList.remove(position);
+                mCart.getLinhas().remove(position);
                 notifyItemRemoved(position);
-                notifyItemChanged(position, mItemArrayList);
+                notifyItemChanged(position, mCart);
 
             }
         });
@@ -114,7 +121,7 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListViewHolder>{
 
     @Override
     public int getItemCount() {
-        return mItemArrayList.size();
+        return mCart.getLinhas().size();
     }
 }
 

@@ -17,6 +17,10 @@ public class LinhaData {
     private Integer versao;    
 	private String descricao;
 	private Integer idCarrinho;
+	private Double taxaTotal;
+	private Double precoFinal;
+	private Double precoIVA;
+	private Double precoPackIVA;
 
 	public final static BigDecimal IVA = new BigDecimal(0.06);
 
@@ -134,12 +138,25 @@ public class LinhaData {
 	public BigDecimal getPrecoFinal() {
 		return getPrecoTotal().multiply(BigDecimal.ONE.add(IVA));
 	}
-	
-	
 
+	public void setTaxaTotal(Double taxaTotal) {
+		this.taxaTotal = taxaTotal;
+	}
+
+	public void setPrecoFinal(Double precoFinal) {
+		this.precoFinal = precoFinal;
+	}
+
+	public void setPrecoIVA(Double precoIVA) {
+		this.precoIVA = precoIVA;
+	}
+
+	public void setPrecoPackIVA(Double precoPackIVA) {
+		this.precoPackIVA = precoPackIVA;
+	}
 
 	public LinhaData(Integer idProduto, Integer versao, String nomeProduto, BigDecimal preco, BigDecimal precoPack,
-			String porcao, String porcaoPack, Integer quantidadeMinima,Integer quantidade,Integer quantidadePack, String descricao) {
+					 String porcao, String porcaoPack, Integer quantidadeMinima, Integer quantidade, Integer quantidadePack, String descricao) {
 		super();
 		this.idProduto = idProduto;
 		this.versao = versao;
